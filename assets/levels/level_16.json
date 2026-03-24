@@ -1,0 +1,14 @@
+{
+  "level_id": 16,
+  "grid_size": 7,
+  "tiles": [
+    {"x": 0, "y": 0, "type": "emitter",  "dir": "right", "color": "0xFF00E5FF"},
+    {"x": 0, "y": 6, "type": "emitter",  "dir": "right", "color": "0xFF00E5FF"},
+    {"x": 4, "y": 0, "type": "mirror",   "rot": 0},
+    {"x": 4, "y": 6, "type": "mirror",   "rot": 1},
+    {"x": 4, "y": 2, "type": "mirror",   "rot": 1},
+    {"x": 4, "y": 4, "type": "mirror",   "rot": 0},
+    {"x": 6, "y": 2, "type": "receiver", "color": "0xFF00E5FF"},
+    {"x": 6, "y": 4, "type": "receiver", "color": "0xFF00E5FF"}
+  ]
+}

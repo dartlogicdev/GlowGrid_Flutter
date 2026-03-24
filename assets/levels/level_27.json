@@ -1,0 +1,24 @@
+{
+  "level_id": 27,
+  "grid_size": 8,
+  "tiles": [
+    {"x": 0, "y": 1, "type": "emitter",  "dir": "right", "color": "0xFF00E5FF"},
+    {"x": 0, "y": 7, "type": "emitter",  "dir": "right", "color": "0xFF00E5FF"},
+    {"x": 0, "y": 4, "type": "emitter",  "dir": "right", "color": "0xFF00E5FF"},
+    {"x": 0, "y": 0, "type": "emitter",  "dir": "right", "color": "0xFF00E5FF"},
+    {"x": 3, "y": 1, "type": "mirror",   "rot": 0},
+    {"x": 3, "y": 3, "type": "mirror",   "rot": 1},
+    {"x": 6, "y": 3, "type": "splitter", "rot": 0},
+    {"x": 2, "y": 7, "type": "mirror",   "rot": 1},
+    {"x": 2, "y": 5, "type": "mirror",   "rot": 0},
+    {"x": 5, "y": 4, "type": "mirror",   "rot": 0},
+    {"x": 5, "y": 6, "type": "mirror",   "rot": 1},
+    {"x": 2, "y": 0, "type": "mirror",   "rot": 0},
+    {"x": 2, "y": 2, "type": "mirror",   "rot": 1},
+    {"x": 6, "y": 2, "type": "receiver", "color": "0xFF00E5FF"},
+    {"x": 6, "y": 4, "type": "receiver", "color": "0xFF00E5FF"},
+    {"x": 6, "y": 5, "type": "receiver", "color": "0xFF00E5FF"},
+    {"x": 7, "y": 6, "type": "receiver", "color": "0xFF00E5FF"},
+    {"x": 5, "y": 2, "type": "receiver", "color": "0xFF00E5FF"}
+  ]
+}

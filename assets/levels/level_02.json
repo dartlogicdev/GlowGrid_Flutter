@@ -1,0 +1,10 @@
+{
+  "level_id": 2,
+  "grid_size": 5,
+  "tiles": [
+    {"x": 0, "y": 4, "type": "emitter",  "dir": "right", "color": "0xFF00E5FF"},
+    {"x": 2, "y": 4, "type": "mirror",   "rot": 1},
+    {"x": 2, "y": 1, "type": "mirror",   "rot": 1},
+    {"x": 4, "y": 1, "type": "receiver", "color": "0xFF00E5FF"}
+  ]
+}
