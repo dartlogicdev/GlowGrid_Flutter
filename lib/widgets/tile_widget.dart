@@ -21,6 +21,17 @@ class TileWidget extends StatelessWidget {
       return _SlotTileWidget(tile: tile);
     }
 
+    // ── Empty tile in a free-placement level ───────────────────────────────
+    if (tile.type == TileType.empty) {
+      final level = state.currentLevel;
+      if (level.freePlacement) {
+        final placed = state.placedTiles['${tile.x},${tile.y}'];
+        if (placed != null || state.inventoryMirrors > 0 || state.inventorySplitters > 0) {
+          return _SlotTileWidget(tile: tile);
+        }
+      }
+    }
+
     // ── Wall tile ──────────────────────────────────────────────────────────
     if (tile.type == TileType.wall) {
       return _buildWallTile();

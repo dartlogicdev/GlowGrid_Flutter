@@ -72,8 +72,29 @@ class LightEngine {
 
       switch (tile.type) {
         case TileType.empty:
-          // Continue straight.
-          queue.add(_Ray(x: nx, y: ny, dir: ray.dir, color: ray.color));
+          // In free-placement levels a piece may be placed on an empty cell.
+          final emptyKey = '$nx,$ny';
+          final emptyPlaced = placedTiles?[emptyKey];
+          if (emptyPlaced != null) {
+            final (placedType, placedRot) = emptyPlaced;
+            switch (placedType) {
+              case TileType.mirror:
+                final newDir = _mirrorDeflect(ray.dir, placedRot);
+                queue.add(_Ray(x: nx, y: ny, dir: newDir, color: ray.color));
+                break;
+              case TileType.splitter:
+                final outDirs = _splitterDirs(ray.dir, placedRot);
+                for (final d in outDirs) {
+                  queue.add(_Ray(x: nx, y: ny, dir: d, color: ray.color));
+                }
+                break;
+              default:
+                queue.add(_Ray(x: nx, y: ny, dir: ray.dir, color: ray.color));
+            }
+          } else {
+            // Continue straight.
+            queue.add(_Ray(x: nx, y: ny, dir: ray.dir, color: ray.color));
+          }
           break;
 
         case TileType.emitter:

@@ -9,7 +9,17 @@ class Level {
   /// Minimum number of moves to solve this level optimally (0 = not tracked).
   final int minMoves;
 
-  Level({required this.id, required this.gridSize, required this.tiles, this.minMoves = 0});
+  /// When true, the player may place inventory pieces on any empty cell
+  /// (not just pre-defined slot tiles).
+  final bool freePlacement;
+
+  Level({
+    required this.id,
+    required this.gridSize,
+    required this.tiles,
+    this.minMoves = 0,
+    this.freePlacement = false,
+  });
 
   factory Level.fromJson(Map<String, dynamic> json) {
     final rawTiles = json['tiles'] as List<dynamic>;
@@ -33,6 +43,7 @@ class Level {
       gridSize: size,
       tiles: tiles,
       minMoves: json['min_moves'] as int? ?? 0,
+      freePlacement: json['free_placement'] as bool? ?? false,
     );
   }
 

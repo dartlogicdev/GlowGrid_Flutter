@@ -62,13 +62,16 @@ class GameState extends ChangeNotifier {
 
   /// Whether the current level uses the placement mechanic.
   bool get isPlacementLevel =>
+      currentLevel.freePlacement ||
       currentLevel.tiles.any((t) => t.type == TileType.slot);
 
-  /// Place a piece on a slot. Returns false if the slot is occupied or the
-  /// inventory is empty / the tile is not a slot.
+  /// Place a piece on a slot or (in free-placement levels) any empty cell.
+  /// Returns false if the cell is occupied, not valid, or the inventory is empty.
   bool placeTile(int x, int y, TileType type) {
     final tile = currentLevel.tileAt(x, y);
-    if (tile.type != TileType.slot) return false;
+    final validTarget = tile.type == TileType.slot ||
+        (currentLevel.freePlacement && tile.type == TileType.empty);
+    if (!validTarget) return false;
     final key = '$x,$y';
     if (_placedTiles.containsKey(key)) return false;
 
@@ -93,7 +96,7 @@ class GameState extends ChangeNotifier {
     return true;
   }
 
-  /// Remove a placed piece from a slot and return it to inventory.
+  /// Remove a placed piece from a slot or free-placement cell and return it to inventory.
   void removePlacedTile(int x, int y) {
     final key = '$x,$y';
     final placed = _placedTiles.remove(key);
