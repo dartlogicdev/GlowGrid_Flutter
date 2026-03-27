@@ -1,1 +1,1 @@
-enum TileType { empty, emitter, receiver, mirror, splitter, prism }
+enum TileType { empty, emitter, receiver, mirror, splitter, prism, wall, slot }

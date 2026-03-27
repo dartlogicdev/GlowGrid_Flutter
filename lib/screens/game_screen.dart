@@ -106,11 +106,38 @@ class _GameScreenState extends State<GameScreen> {
           // Grid
           Expanded(child: const GameGrid()),
 
+          // Inventory bar (only for placement levels)
+          if (state.isPlacementLevel) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _InventoryChip(
+                    icon: Icons.commit_rounded,
+                    label: 'MIRROR',
+                    count: state.inventoryMirrors,
+                    color: const Color(0xFF88AAFF),
+                  ),
+                  const SizedBox(width: 16),
+                  _InventoryChip(
+                    icon: Icons.add_rounded,
+                    label: 'SPLITTER',
+                    count: state.inventorySplitters,
+                    color: const Color(0xFFBB88FF),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
           // Hint text
           Padding(
-            padding: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.only(bottom: 12),
             child: Text(
-              s.gameHint,
+              state.isPlacementLevel
+                  ? _placementHint(s)
+                  : s.gameHint,
               style: TextStyle(
                 color: Colors.white.withAlpha(70),
                 fontSize: 11,
@@ -146,6 +173,58 @@ class _GameScreenState extends State<GameScreen> {
         color: color.withAlpha(160),
         fontSize: 10,
         letterSpacing: 1,
+      ),
+    );
+  }
+
+  String _placementHint(AppStrings s) {
+    // Reuse the language system — just use a simple english-only fallback here,
+    // the key will be added to AppStrings below.
+    return s.placementHint;
+  }
+}
+
+// ── Inventory Chip ─────────────────────────────────────────────────────────────
+
+class _InventoryChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final int count;
+  final Color color;
+
+  const _InventoryChip({
+    required this.icon,
+    required this.label,
+    required this.count,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: count > 0 ? color : color.withAlpha(60),
+          width: 1.2,
+        ),
+        color: count > 0 ? color.withAlpha(18) : Colors.transparent,
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: count > 0 ? color : color.withAlpha(80), size: 14),
+          const SizedBox(width: 6),
+          Text(
+            '$label  ×$count',
+            style: TextStyle(
+              color: count > 0 ? color : color.withAlpha(80),
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 1.5,
+            ),
+          ),
+        ],
       ),
     );
   }

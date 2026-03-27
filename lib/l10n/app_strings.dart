@@ -535,6 +535,19 @@ class AppStrings {
         'hi': 'TAP करें घुमाने के लिए  •  किरण को दर्पण से निर्देशित करें',
       });
 
+  String get placementHint => _t({
+        'en': 'TAP slot to place  •  TAP piece to rotate  •  HOLD to remove',
+        'de': 'Feld antippen zum Platzieren  •  Tippen zum Drehen  •  Halten zum Entfernen',
+        'fr': 'Appuyez pour placer  •  Appuyez pour tourner  •  Maintenez pour retirer',
+        'es': 'Toca para colocar  •  Toca para girar  •  Mantén para quitar',
+        'tr': 'Yerleştirmek için dokun  •  Döndürmek için dokun  •  Kaldırmak için basılı tut',
+        'ja': 'タップで配置  •  タップで回転  •  長押しで削除',
+        'ru': 'Нажмите для размещения  •  Нажмите для поворота  •  Удерживайте для удаления',
+        'it': 'Tocca per posizionare  •  Tocca per ruotare  •  Tieni premuto per rimuovere',
+        'pt': 'Toque para colocar  •  Toque para girar  •  Segure para remover',
+        'hi': 'TAP करें रखने के लिए  •  TAP करें घुमाने के लिए  •  HOLD करें हटाने के लिए',
+      });
+
   String get letsPlay => _t({
         'en': "LET'S PLAY!",
         'de': "LOS GEHT'S!",

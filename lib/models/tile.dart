@@ -49,6 +49,12 @@ class Tile {
       case 'prism':
         type = TileType.prism;
         break;
+      case 'wall':
+        type = TileType.wall;
+        break;
+      case 'slot':
+        type = TileType.slot;
+        break;
       default:
         type = TileType.empty;
     }

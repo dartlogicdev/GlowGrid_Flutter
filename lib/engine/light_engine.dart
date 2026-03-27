@@ -19,8 +19,11 @@ class LightEngine {
   /// Traces all beams and returns:
   ///  - a list of [LightSegment] for drawing.
   ///  - a map from receiver tile key ("x,y") → lit Color.
+  ///
+  /// [placedTiles] maps "x,y" → (TileType, rotation) for pieces placed by the
+  /// player into slot cells.
   static ({List<LightSegment> segments, Map<String, Color> litReceivers})
-  trace(Level level, {bool multiColor = false}) {
+  trace(Level level, {bool multiColor = false, Map<String, (TileType, int)>? placedTiles}) {
     final segments = <LightSegment>[];
     final litReceivers = <String, Color>{};
 
@@ -75,6 +78,37 @@ class LightEngine {
 
         case TileType.emitter:
           // Emitters block beams that hit them.
+          break;
+
+        case TileType.wall:
+          // Walls block beams completely.
+          break;
+
+        case TileType.slot:
+          // Check if the player placed a piece here.
+          final slotKey = '$nx,$ny';
+          final placed = placedTiles?[slotKey];
+          if (placed != null) {
+            final (placedType, placedRot) = placed;
+            switch (placedType) {
+              case TileType.mirror:
+                final newDir = _mirrorDeflect(ray.dir, placedRot);
+                queue.add(_Ray(x: nx, y: ny, dir: newDir, color: ray.color));
+                break;
+              case TileType.splitter:
+                final outDirs = _splitterDirs(ray.dir, placedRot);
+                for (final d in outDirs) {
+                  queue.add(_Ray(x: nx, y: ny, dir: d, color: ray.color));
+                }
+                break;
+              default:
+                // Anything else passes through.
+                queue.add(_Ray(x: nx, y: ny, dir: ray.dir, color: ray.color));
+            }
+          } else {
+            // Empty slot — beam passes through.
+            queue.add(_Ray(x: nx, y: ny, dir: ray.dir, color: ray.color));
+          }
           break;
 
         case TileType.receiver:

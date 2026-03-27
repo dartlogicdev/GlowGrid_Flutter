@@ -1,11 +1,16 @@
 {
   "level_id": 14,
-  "grid_size": 7,
+  "grid_size": 6,
+  "inventory_mirrors": 2,
+  "inventory_splitters": 0,
   "tiles": [
     {"x": 0, "y": 3, "type": "emitter",  "dir": "right", "color": "0xFF00E5FF"},
-    {"x": 3, "y": 3, "type": "mirror",   "rot": 1},
-    {"x": 3, "y": 0, "type": "splitter", "rot": 1},
-    {"x": 6, "y": 0, "type": "receiver", "color": "0xFF00E5FF"},
-    {"x": 0, "y": 0, "type": "receiver", "color": "0xFF00E5FF"}
+    {"x": 5, "y": 1, "type": "receiver", "color": "0xFF00E5FF"},
+    {"x": 5, "y": 5, "type": "receiver", "color": "0xFF00E5FF"},
+    {"x": 2, "y": 3, "type": "wall"},
+    {"x": 3, "y": 3, "type": "wall"},
+    {"x": 1, "y": 3, "type": "slot"},
+    {"x": 4, "y": 1, "type": "slot"},
+    {"x": 4, "y": 5, "type": "slot"}
   ]
 }

@@ -14,6 +14,19 @@ class TileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final state = context.read<GameState>();
+
+    // ── Slot tile ──────────────────────────────────────────────────────────
+    if (tile.type == TileType.slot) {
+      return _SlotTileWidget(tile: tile);
+    }
+
+    // ── Wall tile ──────────────────────────────────────────────────────────
+    if (tile.type == TileType.wall) {
+      return _buildWallTile();
+    }
+
+    // ── Normal interactive tiles ───────────────────────────────────────────
     final bool interactive = tile.type == TileType.mirror ||
         tile.type == TileType.splitter ||
         tile.type == TileType.prism;
@@ -24,13 +37,27 @@ class TileWidget extends StatelessWidget {
       child = GestureDetector(
         onTap: () {
           HapticFeedback.lightImpact();
-          context.read<GameState>().rotateTile(tile.x, tile.y);
+          state.rotateTile(tile.x, tile.y);
         },
         child: child,
       );
     }
 
     return child;
+  }
+
+  Widget _buildWallTile() {
+    return Container(
+      margin: const EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1C0A00),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: const Color(0xFF663300), width: 1.2),
+      ),
+      child: const Center(
+        child: Icon(Icons.square_rounded, color: Color(0xFF994400), size: 18),
+      ),
+    );
   }
 
   Widget _buildTileContent(BuildContext context) {
@@ -83,6 +110,10 @@ class TileWidget extends StatelessWidget {
         return const Color(0xFF16213E);
       case TileType.prism:
         return const Color(0xFF16213E);
+      case TileType.wall:
+        return const Color(0xFF1C0A00);
+      case TileType.slot:
+        return const Color(0xFF0A120A);
       case TileType.empty:
         return const Color(0xFF0F0F1A);
     }
@@ -100,6 +131,10 @@ class TileWidget extends StatelessWidget {
       case TileType.splitter:
       case TileType.prism:
         return const Color(0xFF334477);
+      case TileType.wall:
+        return const Color(0xFF663300);
+      case TileType.slot:
+        return const Color(0xFF1A3A1A);
       case TileType.empty:
         return const Color(0xFF1A1A2E);
     }
@@ -134,9 +169,187 @@ class TileWidget extends StatelessWidget {
         return _SplitterIcon(rotation: tile.rotation);
       case TileType.prism:
         return _PrismIcon();
+      case TileType.wall:
+        return const Icon(Icons.square_rounded, color: Color(0xFF994400), size: 18);
+      case TileType.slot:
       case TileType.empty:
         return const SizedBox.shrink();
     }
+  }
+}
+
+// ── Slot Tile Widget ──────────────────────────────────────────────────────────
+
+class _SlotTileWidget extends StatelessWidget {
+  final Tile tile;
+  const _SlotTileWidget({required this.tile});
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<GameState>();
+    final key = '${tile.x},${tile.y}';
+    final placed = state.placedTiles[key];
+
+    if (placed != null) {
+      final (type, rot) = placed;
+      return GestureDetector(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          state.rotatePlacedTile(tile.x, tile.y);
+        },
+        onLongPress: () {
+          HapticFeedback.mediumImpact();
+          state.removePlacedTile(tile.x, tile.y);
+        },
+        child: Container(
+          margin: const EdgeInsets.all(2),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0A2A0A),
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: const Color(0xFF33AA33), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF33AA33).withAlpha(60),
+                blurRadius: 8,
+              )
+            ],
+          ),
+          child: Center(
+            child: type == TileType.mirror
+                ? _MirrorIcon(rotation: rot)
+                : _SplitterIcon(rotation: rot),
+          ),
+        ),
+      );
+    }
+
+    // Empty slot — tap to open placement picker.
+    return GestureDetector(
+      onTap: () => _showPlacePicker(context, state),
+      child: Container(
+        margin: const EdgeInsets.all(2),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0A120A),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(
+            color: const Color(0xFF1A3A1A),
+            width: 1.2,
+          ),
+        ),
+        child: Center(
+          child: Icon(
+            Icons.add_rounded,
+            color: const Color(0xFF33AA33).withAlpha(140),
+            size: 16,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showPlacePicker(BuildContext context, GameState state) {
+    final hasMirror = state.inventoryMirrors > 0;
+    final hasSplitter = state.inventorySplitters > 0;
+    if (!hasMirror && !hasSplitter) return;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF0D0D1F),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'PLACE ELEMENT',
+              style: TextStyle(
+                color: const Color(0xFF33AA33),
+                letterSpacing: 3,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                if (hasMirror)
+                  _PickerButton(
+                    label: 'MIRROR',
+                    count: state.inventoryMirrors,
+                    icon: CustomPaint(
+                      size: const Size(32, 32),
+                      painter: _MirrorPainter(rotation: 0),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      state.placeTile(tile.x, tile.y, TileType.mirror);
+                    },
+                  ),
+                if (hasSplitter)
+                  _PickerButton(
+                    label: 'SPLITTER',
+                    count: state.inventorySplitters,
+                    icon: CustomPaint(
+                      size: const Size(32, 32),
+                      painter: _SplitterPainter(rotation: 0),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      state.placeTile(tile.x, tile.y, TileType.splitter);
+                    },
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PickerButton extends StatelessWidget {
+  final String label;
+  final int count;
+  final Widget icon;
+  final VoidCallback onTap;
+  const _PickerButton(
+      {required this.label,
+      required this.count,
+      required this.icon,
+      required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFF33AA33), width: 1.5),
+          color: const Color(0xFF0A2A0A),
+        ),
+        child: Column(
+          children: [
+            icon,
+            const SizedBox(height: 10),
+            Text(label,
+                style: const TextStyle(
+                    color: Color(0xFF88FFAA),
+                    fontSize: 12,
+                    letterSpacing: 2)),
+            Text('x$count',
+                style: TextStyle(
+                    color: Colors.white.withAlpha(160), fontSize: 11)),
+          ],
+        ),
+      ),
+    );
   }
 }
 

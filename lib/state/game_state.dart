@@ -29,6 +29,79 @@ class GameState extends ChangeNotifier {
   List<LightSegment> get segments => _segments;
   bool get isWon => _checkWin();
 
+  // ── Placement / Inventory ─────────────────────────────────────────────────
+
+  /// Pieces placed by the player into slot cells: "x,y" → (type, rotation).
+  final Map<String, (TileType, int)> _placedTiles = {};
+
+  /// Remaining inventory: number of mirrors and splitters to place.
+  int _inventoryMirrors = 0;
+  int _inventorySplitters = 0;
+
+  Map<String, (TileType, int)> get placedTiles =>
+      Map.unmodifiable(_placedTiles);
+  int get inventoryMirrors => _inventoryMirrors;
+  int get inventorySplitters => _inventorySplitters;
+
+  /// Whether the current level uses the placement mechanic.
+  bool get isPlacementLevel =>
+      currentLevel.tiles.any((t) => t.type == TileType.slot);
+
+  /// Place a piece on a slot. Returns false if the slot is occupied or the
+  /// inventory is empty / the tile is not a slot.
+  bool placeTile(int x, int y, TileType type) {
+    final tile = currentLevel.tileAt(x, y);
+    if (tile.type != TileType.slot) return false;
+    final key = '$x,$y';
+    if (_placedTiles.containsKey(key)) return false;
+
+    if (type == TileType.mirror) {
+      if (_inventoryMirrors <= 0) return false;
+      _inventoryMirrors--;
+    } else if (type == TileType.splitter) {
+      if (_inventorySplitters <= 0) return false;
+      _inventorySplitters--;
+    } else {
+      return false;
+    }
+
+    _placedTiles[key] = (type, 0);
+    _recalcLight();
+    if (isWon) {
+      _solved[_currentIndex] = true;
+      _saveProgress();
+    }
+    notifyListeners();
+    return true;
+  }
+
+  /// Remove a placed piece from a slot and return it to inventory.
+  void removePlacedTile(int x, int y) {
+    final key = '$x,$y';
+    final placed = _placedTiles.remove(key);
+    if (placed == null) return;
+    final (type, _) = placed;
+    if (type == TileType.mirror) _inventoryMirrors++;
+    if (type == TileType.splitter) _inventorySplitters++;
+    _recalcLight();
+    notifyListeners();
+  }
+
+  /// Rotate a placed piece on a slot.
+  void rotatePlacedTile(int x, int y) {
+    final key = '$x,$y';
+    final placed = _placedTiles[key];
+    if (placed == null) return;
+    final (type, rot) = placed;
+    _placedTiles[key] = (type, (rot + 1) % 4);
+    _recalcLight();
+    if (isWon) {
+      _solved[_currentIndex] = true;
+      _saveProgress();
+    }
+    notifyListeners();
+  }
+
   // ── Init ──────────────────────────────────────────────────────────────────
 
   Future<void> init() async {
@@ -72,15 +145,24 @@ class GameState extends ChangeNotifier {
 
   void selectLevel(int index) {
     _currentIndex = index.clamp(0, _allLevels.length - 1);
+    _placedTiles.clear();
     _rebuildLevel();
     notifyListeners();
   }
 
   void rotateTile(int x, int y) {
     final tile = currentLevel.tileAt(x, y);
+
+    // Slot with placed piece → rotate it.
+    if (tile.type == TileType.slot) {
+      rotatePlacedTile(x, y);
+      return;
+    }
+
     if (tile.type == TileType.empty ||
         tile.type == TileType.emitter ||
-        tile.type == TileType.receiver) {
+        tile.type == TileType.receiver ||
+        tile.type == TileType.wall) {
       return;
     }
 
@@ -96,6 +178,7 @@ class GameState extends ChangeNotifier {
   }
 
   void resetLevel() {
+    _placedTiles.clear();
     _rebuildLevel();
     notifyListeners();
   }
@@ -119,9 +202,13 @@ class GameState extends ChangeNotifier {
 
   /// Reload current level from its original JSON data (fresh state).
   void _rebuildLevel() {
-    _allLevels[_currentIndex] = Level.fromJson(
-      json.decode(_rawLevelJsons[_currentIndex]) as Map<String, dynamic>,
-    );
+    _placedTiles.clear();
+    final decoded =
+        json.decode(_rawLevelJsons[_currentIndex]) as Map<String, dynamic>;
+    _allLevels[_currentIndex] = Level.fromJson(decoded);
+    // Restore inventory counts from level definition.
+    _inventoryMirrors = decoded['inventory_mirrors'] as int? ?? 0;
+    _inventorySplitters = decoded['inventory_splitters'] as int? ?? 0;
     _recalcLight();
   }
 
@@ -132,7 +219,11 @@ class GameState extends ChangeNotifier {
       tile.litColor = null;
     }
 
-    final result = LightEngine.trace(currentLevel, multiColor: _multiColorLight);
+    final result = LightEngine.trace(
+      currentLevel,
+      multiColor: _multiColorLight,
+      placedTiles: Map.unmodifiable(_placedTiles),
+    );
     _segments = result.segments;
     _litReceivers = result.litReceivers;
 
