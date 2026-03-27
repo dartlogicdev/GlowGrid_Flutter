@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../state/game_state.dart';
+import '../state/level_stars_state.dart';
 import 'game_screen.dart';
 
 class LevelSelectScreen extends StatelessWidget {
@@ -10,6 +11,7 @@ class LevelSelectScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<GameState>();
+    final starsState = context.watch<LevelStarsState>();
     final s = AppStrings.of(context);
 
     return Scaffold(
@@ -40,10 +42,13 @@ class LevelSelectScreen extends StatelessWidget {
             crossAxisCount: 4,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
+            childAspectRatio: 0.88,
           ),
           itemCount: state.totalLevels,
           itemBuilder: (context, index) {
             final isSolved = state.solved[index];
+            final levelId = index + 1;
+            final stars = starsState.getStars(levelId);
             final color = isSolved
                 ? const Color(0xFF00E5FF)
                 : const Color(0xFF334477);
@@ -72,20 +77,23 @@ class LevelSelectScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '${index + 1}',
+                      '$levelId',
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: color,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    if (isSolved)
+                    _MiniStars(stars: stars),
+                    if (isSolved && stars == 0) ...[
+                      const SizedBox(height: 2),
                       const Icon(
                         Icons.check_circle_outline_rounded,
                         color: Color(0xFF00E5FF),
-                        size: 14,
+                        size: 12,
                       ),
+                    ],
                   ],
                 ),
               ),
@@ -93,6 +101,28 @@ class LevelSelectScreen extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+}
+
+class _MiniStars extends StatelessWidget {
+  final int stars;
+  const _MiniStars({required this.stars});
+
+  @override
+  Widget build(BuildContext context) {
+    if (stars == 0) return const SizedBox(height: 11);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(5, (i) {
+        final earned = i < stars;
+        return Icon(
+          earned ? Icons.star_rounded : Icons.star_outline_rounded,
+          color: earned ? const Color(0xFFFFCC00) : Colors.white.withAlpha(35),
+          size: 9,
+        );
+      }),
     );
   }
 }

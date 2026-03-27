@@ -2,9 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../state/game_state.dart';
+import '../state/level_stars_state.dart';
 
-class WinDialog extends StatelessWidget {
+class WinDialog extends StatefulWidget {
   const WinDialog({super.key});
+
+  @override
+  State<WinDialog> createState() => _WinDialogState();
+}
+
+class _WinDialogState extends State<WinDialog> {
+  int _stars = 0;
+  int _moveCount = 0;
+  bool _hasMinMoves = false;
+  bool _initialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      _initialized = true;
+      final gameState = context.read<GameState>();
+      _stars = gameState.calculateStars();
+      _moveCount = gameState.moveCount;
+      _hasMinMoves = gameState.currentLevel.minMoves > 0;
+      context
+          .read<LevelStarsState>()
+          .setStars(gameState.currentLevel.id, _stars);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +46,7 @@ class WinDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Icon
+            // Check icon
             Container(
               width: 70,
               height: 70,
@@ -63,13 +89,28 @@ class WinDialog extends StatelessWidget {
                 fontSize: 13,
               ),
             ),
+
+            // Star rating (only for placement levels with min_moves defined)
+            if (_hasMinMoves) ...[
+              const SizedBox(height: 28),
+              _StarsDisplay(stars: _stars),
+              const SizedBox(height: 10),
+              Text(
+                '${s.movesLabel}: $_moveCount',
+                style: TextStyle(
+                  color: Colors.white.withAlpha(130),
+                  fontSize: 12,
+                  letterSpacing: 1,
+                ),
+              ),
+            ],
+
             const SizedBox(height: 32),
 
             // Buttons row
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Replay button
                 _DialogButton(
                   label: s.replay,
                   color: const Color(0xFF334477),
@@ -109,6 +150,76 @@ class WinDialog extends StatelessWidget {
     );
   }
 }
+
+// ── Animated star row ─────────────────────────────────────────────────────────
+
+class _StarsDisplay extends StatefulWidget {
+  final int stars;
+  const _StarsDisplay({required this.stars});
+
+  @override
+  State<_StarsDisplay> createState() => _StarsDisplayState();
+}
+
+class _StarsDisplayState extends State<_StarsDisplay>
+    with TickerProviderStateMixin {
+  late final List<AnimationController> _controllers;
+  late final List<Animation<double>> _scales;
+
+  @override
+  void initState() {
+    super.initState();
+    _controllers = List.generate(
+      5,
+      (i) => AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 380),
+      ),
+    );
+    _scales = _controllers
+        .map((c) => CurvedAnimation(parent: c, curve: Curves.elasticOut))
+        .toList();
+
+    for (int i = 0; i < 5; i++) {
+      Future.delayed(Duration(milliseconds: 120 + i * 130), () {
+        if (mounted) { _controllers[i].forward(); }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    for (final c in _controllers) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(5, (i) {
+        final earned = i < widget.stars;
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: ScaleTransition(
+            scale: _scales[i],
+            child: Icon(
+              earned ? Icons.star_rounded : Icons.star_outline_rounded,
+              color: earned
+                  ? const Color(0xFFFFCC00)
+                  : Colors.white.withAlpha(55),
+              size: 40,
+            ),
+          ),
+        );
+      }),
+    );
+  }
+}
+
+// ── Dialog button ─────────────────────────────────────────────────────────────
 
 class _DialogButton extends StatelessWidget {
   final String label;

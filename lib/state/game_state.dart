@@ -29,6 +29,23 @@ class GameState extends ChangeNotifier {
   List<LightSegment> get segments => _segments;
   bool get isWon => _checkWin();
 
+  // ── Move Counter ──────────────────────────────────────────────────────────
+
+  int _moveCount = 0;
+  int get moveCount => _moveCount;
+
+  /// Returns 1–5 stars based on move count vs the level's optimal solution.
+  /// Returns 5 for levels without a defined minimum (min_moves == 0).
+  int calculateStars() {
+    final min = currentLevel.minMoves;
+    if (min <= 0) return 5;
+    if (_moveCount <= min) return 5;
+    if (_moveCount <= min + 2) return 4;
+    if (_moveCount <= (min * 1.5).ceil()) return 3;
+    if (_moveCount <= min * 2) return 2;
+    return 1;
+  }
+
   // ── Placement / Inventory ─────────────────────────────────────────────────
 
   /// Pieces placed by the player into slot cells: "x,y" → (type, rotation).
@@ -66,6 +83,7 @@ class GameState extends ChangeNotifier {
     }
 
     _placedTiles[key] = (type, 0);
+    _moveCount++;
     _recalcLight();
     if (isWon) {
       _solved[_currentIndex] = true;
@@ -94,6 +112,7 @@ class GameState extends ChangeNotifier {
     if (placed == null) return;
     final (type, rot) = placed;
     _placedTiles[key] = (type, (rot + 1) % 4);
+    _moveCount++;
     _recalcLight();
     if (isWon) {
       _solved[_currentIndex] = true;
@@ -167,6 +186,7 @@ class GameState extends ChangeNotifier {
     }
 
     tile.rotate();
+    _moveCount++;
     _recalcLight();
 
     if (isWon) {
@@ -203,6 +223,7 @@ class GameState extends ChangeNotifier {
   /// Reload current level from its original JSON data (fresh state).
   void _rebuildLevel() {
     _placedTiles.clear();
+    _moveCount = 0;
     final decoded =
         json.decode(_rawLevelJsons[_currentIndex]) as Map<String, dynamic>;
     _allLevels[_currentIndex] = Level.fromJson(decoded);

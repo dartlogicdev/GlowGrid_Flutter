@@ -3,18 +3,13 @@
   "grid_size": 7,
   "inventory_mirrors": 2,
   "inventory_splitters": 1,
+  "min_moves": 4,
   "tiles": [
-    {"x": 0, "y": 0, "type": "emitter",  "dir": "right", "color": "0xFF00E5FF"},
-    {"x": 0, "y": 6, "type": "emitter",  "dir": "right", "color": "0xFF00E5FF"},
-    {"x": 6, "y": 2, "type": "receiver", "color": "0xFF00E5FF"},
-    {"x": 6, "y": 4, "type": "receiver", "color": "0xFF00E5FF"},
-    {"x": 6, "y": 6, "type": "receiver", "color": "0xFF00E5FF"},
-    {"x": 2, "y": 0, "type": "wall"},
-    {"x": 2, "y": 1, "type": "wall"},
-    {"x": 2, "y": 5, "type": "wall"},
-    {"x": 2, "y": 6, "type": "wall"},
-    {"x": 1, "y": 0, "type": "slot"},
+    {"x": 3, "y": 0, "type": "emitter",  "dir": "down",  "color": "0xFF00E5FF"},
+    {"x": 1, "y": 0, "type": "receiver", "color": "0xFF00E5FF"},
+    {"x": 5, "y": 0, "type": "receiver", "color": "0xFF00E5FF"},
     {"x": 3, "y": 3, "type": "slot"},
-    {"x": 1, "y": 6, "type": "slot"}
+    {"x": 1, "y": 3, "type": "slot"},
+    {"x": 5, "y": 3, "type": "slot"}
   ]
 }

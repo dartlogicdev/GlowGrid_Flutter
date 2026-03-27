@@ -3,13 +3,12 @@
   "grid_size": 6,
   "inventory_mirrors": 1,
   "inventory_splitters": 1,
+  "min_moves": 4,
   "tiles": [
-    {"x": 0, "y": 0, "type": "emitter",  "dir": "right", "color": "0xFF00E5FF"},
-    {"x": 5, "y": 0, "type": "receiver", "color": "0xFF00E5FF"},
-    {"x": 5, "y": 3, "type": "receiver", "color": "0xFF00E5FF"},
-    {"x": 2, "y": 0, "type": "wall"},
-    {"x": 3, "y": 0, "type": "wall"},
-    {"x": 1, "y": 0, "type": "slot"},
-    {"x": 4, "y": 0, "type": "slot"}
+    {"x": 0, "y": 2, "type": "emitter",  "dir": "right", "color": "0xFF00E5FF"},
+    {"x": 2, "y": 0, "type": "receiver", "color": "0xFF00E5FF"},
+    {"x": 5, "y": 4, "type": "receiver", "color": "0xFF00E5FF"},
+    {"x": 2, "y": 2, "type": "slot"},
+    {"x": 2, "y": 4, "type": "slot"}
   ]
 }

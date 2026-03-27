@@ -548,6 +548,19 @@ class AppStrings {
         'hi': 'TAP करें रखने के लिए  •  TAP करें घुमाने के लिए  •  HOLD करें हटाने के लिए',
       });
 
+  String get movesLabel => _t({
+        'en': 'Moves',
+        'de': 'Schritte',
+        'fr': 'Coups',
+        'es': 'Movimientos',
+        'tr': 'Hamle',
+        'ja': 'ステップ',
+        'ru': 'Ходы',
+        'it': 'Mosse',
+        'pt': 'Movimentos',
+        'hi': 'कदम',
+      });
+
   String get letsPlay => _t({
         'en': "LET'S PLAY!",
         'de': "LOS GEHT'S!",

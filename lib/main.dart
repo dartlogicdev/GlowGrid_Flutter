@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'l10n/app_strings.dart';
 import 'state/game_state.dart';
 import 'state/locale_state.dart';
+import 'state/level_stars_state.dart';
 import 'state/settings_state.dart';
 import 'screens/start_screen.dart';
 
@@ -36,6 +37,9 @@ void main() async {
   final localeState = LocaleState();
   await localeState.init();
 
+  final levelStarsState = LevelStarsState();
+  await levelStarsState.init();
+
   // Sync light colour mode from settings into game state.
   gameState.setMultiColorLight(settingsState.multiColorLight);
   settingsState.addListener(() {
@@ -48,6 +52,7 @@ void main() async {
         ChangeNotifierProvider.value(value: gameState),
         ChangeNotifierProvider.value(value: settingsState),
         ChangeNotifierProvider.value(value: localeState),
+        ChangeNotifierProvider.value(value: levelStarsState),
       ],
       child: const GlowGridApp(),
     ),

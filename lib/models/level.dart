@@ -6,7 +6,10 @@ class Level {
   final int gridSize;
   final List<Tile> tiles;
 
-  Level({required this.id, required this.gridSize, required this.tiles});
+  /// Minimum number of moves to solve this level optimally (0 = not tracked).
+  final int minMoves;
+
+  Level({required this.id, required this.gridSize, required this.tiles, this.minMoves = 0});
 
   factory Level.fromJson(Map<String, dynamic> json) {
     final rawTiles = json['tiles'] as List<dynamic>;
@@ -25,7 +28,12 @@ class Level {
       }
     }
 
-    return Level(id: json['level_id'] as int, gridSize: size, tiles: tiles);
+    return Level(
+      id: json['level_id'] as int,
+      gridSize: size,
+      tiles: tiles,
+      minMoves: json['min_moves'] as int? ?? 0,
+    );
   }
 
   Tile tileAt(int x, int y) =>
