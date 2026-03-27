@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'l10n/app_strings.dart';
 import 'state/game_state.dart';
+import 'state/locale_state.dart';
 import 'state/settings_state.dart';
 import 'screens/start_screen.dart';
 
@@ -30,6 +33,9 @@ void main() async {
   final settingsState = SettingsState();
   await settingsState.init();
 
+  final localeState = LocaleState();
+  await localeState.init();
+
   // Sync light colour mode from settings into game state.
   gameState.setMultiColorLight(settingsState.multiColorLight);
   settingsState.addListener(() {
@@ -41,6 +47,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider.value(value: gameState),
         ChangeNotifierProvider.value(value: settingsState),
+        ChangeNotifierProvider.value(value: localeState),
       ],
       child: const GlowGridApp(),
     ),
@@ -53,9 +60,18 @@ class GlowGridApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final localeState = context.watch<LocaleState>();
     return MaterialApp(
       title: 'GlowGrid',
       debugShowCheckedModeBanner: false,
+      locale: localeState.locale,
+      supportedLocales: AppStrings.supportedLocales,
+      localizationsDelegates: const [
+        AppStrings.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF070711),
         colorScheme: const ColorScheme.dark(

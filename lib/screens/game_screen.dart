@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_strings.dart';
 import '../state/game_state.dart';
 import '../widgets/game_grid.dart';
 import 'win_dialog.dart';
@@ -26,6 +27,7 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<GameState>();
+    final s = AppStrings.of(context);
 
     // Show win dialog once per completion, with a short delay.
     if (state.isWon && !_winShown) {
@@ -59,7 +61,7 @@ class _GameScreenState extends State<GameScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'LEVEL ${state.currentIndex + 1}',
+          s.levelN(state.currentIndex + 1),
           style: const TextStyle(
             color: Color(0xFF00E5FF),
             letterSpacing: 4,
@@ -71,7 +73,7 @@ class _GameScreenState extends State<GameScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded, color: Color(0xFF88AAFF)),
-            tooltip: 'Reset level',
+            tooltip: s.resetLevel,
             onPressed: () {
               state.resetLevel();
               setState(() => _winShown = false);
@@ -108,7 +110,7 @@ class _GameScreenState extends State<GameScreen> {
           Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: Text(
-              'TAP to rotate  •  Use mirrors to guide the beam',
+              s.gameHint,
               style: TextStyle(
                 color: Colors.white.withAlpha(70),
                 fontSize: 11,

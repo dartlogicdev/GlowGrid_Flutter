@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_strings.dart';
 import '../state/settings_state.dart';
 import 'level_select_screen.dart';
 
@@ -90,7 +91,7 @@ class _IntroScreenState extends State<IntroScreen>
                           letterSpacing: 2)),
                   TextButton(
                     onPressed: _finish,
-                    child: Text('SKIP',
+                    child: Text(AppStrings.of(context).skip,
                         style: TextStyle(
                             color: _kBlue.withAlpha(160),
                             letterSpacing: 2,
@@ -108,11 +109,9 @@ class _IntroScreenState extends State<IntroScreen>
                 children: [
                   _WelcomePage(pulse: _pulseCtrl),
                   _ElementPage(
-                    title: 'EMITTER',
+                    title: AppStrings.of(context).emitterTitle,
                     color: _kCyan,
-                    description:
-                        'Fires a beam of light in a fixed direction.\n'
-                        'Its direction is set by the level — it cannot be rotated.',
+                    description: AppStrings.of(context).emitterDesc,
                     visual: AnimatedBuilder(
                       animation: _beamCtrl,
                       builder: (_, __) => CustomPaint(
@@ -122,11 +121,9 @@ class _IntroScreenState extends State<IntroScreen>
                     ),
                   ),
                   _ElementPage(
-                    title: 'MIRROR',
+                    title: AppStrings.of(context).mirrorTitle,
                     color: _kBlue,
-                    description:
-                        'Reflects the beam in a new direction.\n'
-                        'TAP a mirror to rotate it 90° and change its angle.',
+                    description: AppStrings.of(context).mirrorDesc,
                     visual: AnimatedBuilder(
                       animation: Listenable.merge([_beamCtrl, _altCtrl]),
                       builder: (_, __) => CustomPaint(
@@ -136,11 +133,9 @@ class _IntroScreenState extends State<IntroScreen>
                     ),
                   ),
                   _ElementPage(
-                    title: 'SPLITTER',
+                    title: AppStrings.of(context).splitterTitle,
                     color: _kPurple,
-                    description:
-                        'Splits the beam into two paths at once.\n'
-                        'TAP to toggle between horizontal and vertical mode.',
+                    description: AppStrings.of(context).splitterDesc,
                     visual: AnimatedBuilder(
                       animation: _beamCtrl,
                       builder: (_, __) => CustomPaint(
@@ -150,11 +145,9 @@ class _IntroScreenState extends State<IntroScreen>
                     ),
                   ),
                   _ElementPage(
-                    title: 'RECEIVER',
+                    title: AppStrings.of(context).receiverTitle,
                     color: _kCyan,
-                    description:
-                        'Must be hit by a beam of light to activate.\n'
-                        'Light up ALL receivers to complete the level!',
+                    description: AppStrings.of(context).receiverDesc,
                     visual: AnimatedBuilder(
                       animation: _pulseCtrl,
                       builder: (_, __) => CustomPaint(
@@ -206,7 +199,7 @@ class _IntroScreenState extends State<IntroScreen>
                 ),
                 child: Center(
                   child: Text(
-                    _page == _total - 1 ? "LET'S PLAY!" : 'NEXT  →',
+                    _page == _total - 1 ? AppStrings.of(context).letsPlay : AppStrings.of(context).nextArrow,
                     style: const TextStyle(
                       color: _kCyan,
                       fontSize: 16,
@@ -278,15 +271,14 @@ class _WelcomePage extends StatelessWidget {
           ),
           const SizedBox(height: 36),
           Text(
-            'Guide light beams through mirrors and splitters\n'
-            'to activate all receivers.',
+            AppStrings.of(context).welcomeDescription,
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: Colors.white.withAlpha(180), fontSize: 15, height: 1.7),
           ),
           const SizedBox(height: 16),
           Text(
-            'Swipe or tap NEXT to learn the elements →',
+            AppStrings.of(context).swipeToLearn,
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: _kCyan.withAlpha(160), fontSize: 13, letterSpacing: 1),

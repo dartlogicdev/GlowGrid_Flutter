@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_strings.dart';
 import '../state/game_state.dart';
 
 class WinDialog extends StatelessWidget {
@@ -8,6 +9,7 @@ class WinDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.read<GameState>();
+    final s = AppStrings.of(context);
     final hasNext = state.currentIndex < state.totalLevels - 1;
 
     return Dialog(
@@ -41,9 +43,9 @@ class WinDialog extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            const Text(
-              'LEVEL COMPLETE',
-              style: TextStyle(
+            Text(
+              s.levelComplete,
+              style: const TextStyle(
                 color: Color(0xFF00E5FF),
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -55,7 +57,7 @@ class WinDialog extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'All receivers activated!',
+              s.allReceiversActivated,
               style: TextStyle(
                 color: Colors.white.withAlpha(160),
                 fontSize: 13,
@@ -69,7 +71,7 @@ class WinDialog extends StatelessWidget {
               children: [
                 // Replay button
                 _DialogButton(
-                  label: 'REPLAY',
+                  label: s.replay,
                   color: const Color(0xFF334477),
                   textColor: const Color(0xFF88AAFF),
                   onTap: () {
@@ -80,7 +82,7 @@ class WinDialog extends StatelessWidget {
                 if (hasNext) ...[
                   const SizedBox(width: 16),
                   _DialogButton(
-                    label: 'NEXT',
+                    label: s.next,
                     color: const Color(0xFF00E5FF),
                     textColor: Colors.black,
                     onTap: () {
@@ -91,7 +93,7 @@ class WinDialog extends StatelessWidget {
                 ] else ...[
                   const SizedBox(width: 16),
                   _DialogButton(
-                    label: 'MENU',
+                    label: s.menu,
                     color: const Color(0xFF00E5FF),
                     textColor: Colors.black,
                     onTap: () {

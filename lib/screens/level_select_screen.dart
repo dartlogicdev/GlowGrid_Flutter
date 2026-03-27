@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_strings.dart';
 import '../state/game_state.dart';
 import 'game_screen.dart';
 
@@ -9,6 +10,7 @@ class LevelSelectScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<GameState>();
+    final s = AppStrings.of(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFF070711),
@@ -20,9 +22,9 @@ class LevelSelectScreen extends StatelessWidget {
               color: Color(0xFF88AAFF)),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
-          'SELECT LEVEL',
-          style: TextStyle(
+        title: Text(
+          s.selectLevel,
+          style: const TextStyle(
             color: Color(0xFF00E5FF),
             letterSpacing: 4,
             fontSize: 16,

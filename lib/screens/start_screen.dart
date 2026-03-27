@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_strings.dart';
 import '../state/game_state.dart';
 import '../state/settings_state.dart';
 import 'intro_screen.dart';
@@ -12,6 +13,7 @@ class StartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<GameState>();
+    final s = AppStrings.of(context);
     final solvedCount = state.solved.where((s) => s).length;
 
     return Scaffold(
@@ -34,7 +36,7 @@ class StartScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'A light-beam puzzle',
+                s.lightBeamPuzzle,
                 style: TextStyle(
                   color: Colors.white.withAlpha(120),
                   fontSize: 14,
@@ -51,7 +53,7 @@ class StartScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Text(
-                  '$solvedCount / ${state.totalLevels} LEVELS SOLVED',
+                  s.levelsSolved(solvedCount, state.totalLevels),
                   style: const TextStyle(
                     color: Color(0xFF88AAFF),
                     fontSize: 13,
@@ -63,7 +65,7 @@ class StartScreen extends StatelessWidget {
 
               // Play button
               _NeonButton(
-                label: 'PLAY',
+                label: s.play,
                 color: const Color(0xFF00E5FF),
                 onPressed: () {
                   final settings = context.read<SettingsState>();
@@ -78,7 +80,7 @@ class StartScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               _NeonButton(
-                label: 'SETTINGS',
+                label: s.settings,
                 color: const Color(0xFFBB88FF),
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const SettingsScreen()),
