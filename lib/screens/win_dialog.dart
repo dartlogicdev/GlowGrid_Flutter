@@ -14,7 +14,6 @@ class WinDialog extends StatefulWidget {
 class _WinDialogState extends State<WinDialog> {
   int _stars = 0;
   int _moveCount = 0;
-  bool _hasMinMoves = false;
   bool _initialized = false;
 
   @override
@@ -25,7 +24,6 @@ class _WinDialogState extends State<WinDialog> {
       final gameState = context.read<GameState>();
       _stars = gameState.calculateStars();
       _moveCount = gameState.moveCount;
-      _hasMinMoves = gameState.currentLevel.minMoves > 0;
       context
           .read<LevelStarsState>()
           .setStars(gameState.currentLevel.id, _stars);
@@ -90,20 +88,18 @@ class _WinDialogState extends State<WinDialog> {
               ),
             ),
 
-            // Star rating (only for placement levels with min_moves defined)
-            if (_hasMinMoves) ...[
-              const SizedBox(height: 28),
-              _StarsDisplay(stars: _stars),
-              const SizedBox(height: 10),
-              Text(
-                '${s.movesLabel}: $_moveCount',
-                style: TextStyle(
-                  color: Colors.white.withAlpha(130),
-                  fontSize: 12,
-                  letterSpacing: 1,
-                ),
+            // Star rating
+            const SizedBox(height: 28),
+            _StarsDisplay(stars: _stars),
+            const SizedBox(height: 10),
+            Text(
+              '${s.movesLabel}: $_moveCount',
+              style: TextStyle(
+                color: Colors.white.withAlpha(130),
+                fontSize: 12,
+                letterSpacing: 1,
               ),
-            ],
+            ),
 
             const SizedBox(height: 32),
 
