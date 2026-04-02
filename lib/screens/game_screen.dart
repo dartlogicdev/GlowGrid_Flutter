@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
+import '../models/tile_type.dart';
 import '../state/game_state.dart';
 import '../widgets/game_grid.dart';
 import 'win_dialog.dart';
@@ -113,14 +114,16 @@ class _GameScreenState extends State<GameScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _InventoryChip(
+                  _DraggableInventoryChip(
+                    tileType: TileType.mirror,
                     icon: Icons.commit_rounded,
                     label: 'MIRROR',
                     count: state.inventoryMirrors,
                     color: const Color(0xFF88AAFF),
                   ),
                   const SizedBox(width: 16),
-                  _InventoryChip(
+                  _DraggableInventoryChip(
+                    tileType: TileType.splitter,
                     icon: Icons.add_rounded,
                     label: 'SPLITTER',
                     count: state.inventorySplitters,
@@ -191,8 +194,59 @@ class _InventoryChip extends StatelessWidget {
   final String label;
   final int count;
   final Color color;
+  final bool dimmed;
 
   const _InventoryChip({
+    required this.icon,
+    required this.label,
+    required this.count,
+    required this.color,
+    this.dimmed = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final active = count > 0 && !dimmed;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: active ? color : color.withAlpha(60),
+          width: 1.2,
+        ),
+        color: active ? color.withAlpha(18) : Colors.transparent,
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: active ? color : color.withAlpha(80), size: 14),
+          const SizedBox(width: 6),
+          Text(
+            '$label  ×$count',
+            style: TextStyle(
+              color: active ? color : color.withAlpha(80),
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Draggable Inventory Chip ──────────────────────────────────────────────────
+
+class _DraggableInventoryChip extends StatelessWidget {
+  final TileType tileType;
+  final IconData icon;
+  final String label;
+  final int count;
+  final Color color;
+
+  const _DraggableInventoryChip({
+    required this.tileType,
     required this.icon,
     required this.label,
     required this.count,
@@ -201,30 +255,69 @@ class _InventoryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: count > 0 ? color : color.withAlpha(60),
-          width: 1.2,
-        ),
-        color: count > 0 ? color.withAlpha(18) : Colors.transparent,
+    final chip = _InventoryChip(
+      icon: icon,
+      label: label,
+      count: count,
+      color: color,
+    );
+
+    if (count == 0) return chip;
+
+    return Draggable<TileType>(
+      data: tileType,
+      feedbackOffset: const Offset(-28, -28),
+      feedback: _DragFeedback(tileType: tileType, color: color),
+      childWhenDragging: _InventoryChip(
+        icon: icon,
+        label: label,
+        count: count,
+        color: color,
+        dimmed: true,
       ),
-      child: Row(
-        children: [
-          Icon(icon, color: count > 0 ? color : color.withAlpha(80), size: 14),
-          const SizedBox(width: 6),
-          Text(
-            '$label  ×$count',
-            style: TextStyle(
-              color: count > 0 ? color : color.withAlpha(80),
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1.5,
-            ),
-          ),
-        ],
+      child: chip,
+    );
+  }
+}
+
+// ── Drag Feedback Widget ──────────────────────────────────────────────────────
+
+class _DragFeedback extends StatelessWidget {
+  final TileType tileType;
+  final Color color;
+
+  const _DragFeedback({required this.tileType, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          color: color.withAlpha(40),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color, width: 2),
+          boxShadow: [
+            BoxShadow(color: color.withAlpha(100), blurRadius: 18, spreadRadius: 1),
+          ],
+        ),
+        child: Center(
+          child: tileType == TileType.mirror
+              ? Transform.rotate(
+                  angle: -0.7854, // 45°
+                  child: Container(
+                    width: 28,
+                    height: 2.5,
+                    decoration: BoxDecoration(
+                      color: color,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                )
+              : Icon(Icons.add_rounded, color: color, size: 30),
+        ),
       ),
     );
   }

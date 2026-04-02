@@ -234,27 +234,57 @@ class _SlotTileWidget extends StatelessWidget {
       );
     }
 
-    // Empty slot — tap to open placement picker.
-    return GestureDetector(
-      onTap: () => _showPlacePicker(context, state),
-      child: Container(
-        margin: const EdgeInsets.all(2),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0A120A),
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(
-            color: const Color(0xFF1A3A1A),
-            width: 1.2,
+    // Empty slot — DragTarget for drag-and-drop, tap opens picker.
+    return DragTarget<TileType>(
+      onWillAcceptWithDetails: (details) {
+        final gs = context.read<GameState>();
+        if (details.data == TileType.mirror) return gs.inventoryMirrors > 0;
+        if (details.data == TileType.splitter) return gs.inventorySplitters > 0;
+        return false;
+      },
+      onAcceptWithDetails: (details) {
+        HapticFeedback.mediumImpact();
+        context.read<GameState>().placeTile(tile.x, tile.y, details.data);
+      },
+      builder: (_, candidateData, __) {
+        final isHovered = candidateData.isNotEmpty;
+        return GestureDetector(
+          onTap: () => _showPlacePicker(context, state),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 120),
+            margin: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              color: isHovered
+                  ? const Color(0xFF0A2A0A)
+                  : const Color(0xFF0A120A),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                color: isHovered
+                    ? const Color(0xFF33AA33)
+                    : const Color(0xFF1A3A1A),
+                width: isHovered ? 2.0 : 1.2,
+              ),
+              boxShadow: isHovered
+                  ? [
+                      BoxShadow(
+                        color: const Color(0xFF33AA33).withAlpha(90),
+                        blurRadius: 10,
+                      )
+                    ]
+                  : null,
+            ),
+            child: Center(
+              child: Icon(
+                Icons.add_rounded,
+                color: isHovered
+                    ? const Color(0xFF33AA33)
+                    : const Color(0xFF33AA33).withAlpha(140),
+                size: isHovered ? 22 : 16,
+              ),
+            ),
           ),
-        ),
-        child: Center(
-          child: Icon(
-            Icons.add_rounded,
-            color: const Color(0xFF33AA33).withAlpha(140),
-            size: 16,
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 
